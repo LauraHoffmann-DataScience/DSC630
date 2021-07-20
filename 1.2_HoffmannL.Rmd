@@ -1,0 +1,109 @@
+---
+title: "1.2_HoffmannL"
+author: "Laura Hoffmann"
+date: "6/7/2021"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = "C:/Users/laura/Bellevue/Predictive Analytics")
+```
+
+# 1. Import, Plot, Summarize, and Save Data
+## Import the Data
+
+```{r}
+data <- read.csv("EpHdata.csv", header=TRUE)
+data
+```
+
+## Summary Statistics for 2 Variables
+
+```{r}
+summary(data$Jan)
+summary(data$Dec)
+```
+
+## Plot Some of the Features
+### Histograms
+
+```{r}
+June <- data$Jun
+Feb <- data$Feb
+
+# Frequency of hourly wages in the month of June from years 2011-2020
+hist(June, main="Histogram of June Hourly Wages",
+xlab="Hourly Wages",
+xlim=c(22,32),
+col="grey")
+# Frequency of hourly wages in the month of February from years 2011-2021
+hist(Feb, main="Histogram of Feb Hourly Wages",
+xlab="Hourly Wages",
+xlim=c(20,32),
+col="grey")
+
+# I don't really like these histograms or how they're displaying the data but this is the data set I thought was best for doing these simple steps in R. Instead they would look better in a line graph, with wages on the y-axis, and years on the x-axis.
+```
+
+### Line Graphs
+
+```{r}
+months <- c(1,2,3,4,5,6,7,8,9,10,11,12)
+year2011 <- c(data[1,2:13])
+
+plot(months,year2011,type = "o", col = "blue", xlab = "Month", ylab = "Wages ($)",
+   main = "Monthly Hourly Wages 2011")
+
+year2020 <- c(data[10,2:13])
+
+plot(months,year2020,type = "o", col = "blue", xlab = "Month", ylab = "Wages ($)",
+   main = "Monthly Hourly Wages 2020")
+
+# We can see there was a big dip in 2020 probably because of the pandemic
+```
+
+## Save Locally as a CSV File
+
+```{r}
+data2 <- data[1:10,]
+write.csv(data2,'hourlywage2011_2020.csv')
+# Same data (disregarding the 2021 data because it was incomplete) as the data variable but saved to a different csv file locally
+```
+
+# 2. Explore Some Bivariate Relations
+
+```{r}
+# Exploring bivariate relationships between the months doesn't make a ton of sense but they should definitely be highly correlated with one another as typically the average hourly wage increases every month.
+# Scatterplot
+library(ggplot2)
+ggplot(data, aes(x = Jan, y = Feb)) +
+  geom_point()
+```
+
+```{r}
+cor(data2$Jan, data2$Feb)
+```
+
+```{r}
+cor(data2$Year, data2$Dec)
+```
+
+# 3. Organize a Data Report
+
+```{r, include=FALSE}
+library(psych)
+```
+
+```{r}
+# Stats from the data set in a data frame, from the psych library
+describe(data2)
+```
+
+```{r}
+# Types of variables
+str(data2)
+```
+
+## Discuss Results of the Data
+#### This data set was probably not the best to explore for all of these steps, however it was small and simple and the functions could still be applied although not a lot of useful information could be recovered. I find the increase in average hourly wages to be an interesting topic as to why I chose this one but clearly with the months being the varaibles and with hourly wages on the rise all variables will be highly correlated. Of R's data types: character, numeric, integer, complex, and logical one variable (year) is an integer and all others (the months) are numeric in type because they are decimals. After taking out the incomplete row for 2021, December had the highest wage value because it was the most recent point on record. Something that was interesting to view was the range between the variables. Meaning between the years of 2011 and 2020 or ten years worth of time we can see the increase in hourly wages. Choosing one month as an example, December, we can see that from December 2011 to December 2020 the average hourly wage increased by $6.70. April has the highest standard deviation, meaning it has the most points furthest from it's own mean, while January has the lowest standard deviation. Expectedly April therefore has the highest range and January has the lowest range.

@@ -1,0 +1,65 @@
+---
+title: "Assignment3.2_HoffmannL"
+author: "Laura Hoffmann"
+date: "6/21/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load libraries that may be needed
+library(readr)
+library(dplyr)
+library(corrplot)
+library(ggplot2)
+library(skimr)
+library(reshape2)
+```
+
+```{r}
+# load the csv file from the Python file
+data <- read.csv('datanums.csv')
+# look at data
+head(data)
+str(data)
+```
+
+```{r}
+# Cutting down the predictors to find what month and day of the week work best and using the bobblehead promotion
+model <- lm(attend ~ month + day_of_week + bobblehead, data = data)
+summary(model)
+```
+
+```{r}
+# set random seed
+set.seed(11)
+# split the data to set up train and test subsets (75/25 split)
+dt = sort(sample(nrow(data), nrow(data)*.75))
+training <- data[dt, ]
+testing <- data[-dt, ]
+# test the data through the model
+linearmod <- lm(attend ~ month + day_of_week + bobblehead, data = training)
+pred <- predict(linearmod, testing)
+summary(linearmod)
+```
+
+```{r}
+# View actual vs. predicted attendance values
+actualandpred <- data.frame(cbind(actual = testing$attend, predicted = pred))
+actualandpred
+```
+Visualize Prediction Data
+```{r}
+# new data frame
+preddata <- testing
+preddata['Actual'] <- preddata['attend']
+preddata['Predicted'] <- actualandpred$predicted
+melteddata <- melt(data = preddata, id.vars = c("month", "day_of_week"), measure.vars = c('Actual', 'Predicted'))
+# visualize actual vs predicted data
+predplot <- ggplot(melteddata, aes(x = day_of_week, y = value, color=variable)) + geom_point()
+
+predplot + facet_grid(~month) + 
+  xlab('Days of the Week') + 
+  ylab('Attendance') + 
+  ggtitle('Attendance Prediction By Months')
+```
